@@ -1,11 +1,12 @@
 
 var data_obj = {};
-// var names_arr = null;
+var names_arr = [];
 var fpath = 'data/data_Ихтамнет.xml';
 var fpath_loc = 'data/locations.xml';
 var H_header = 50;
 var H_offset = H_header;
 var res = {lang: ''};
+var map;
 
 $(document).ready(function(){
 	
@@ -27,39 +28,62 @@ $(document).ready(function(){
 
 		
 		// Read XML 
-		data = readFile(fpath);
-		data_obj = xml2dataobj(data);
-		data_obj.sort(function (a, b) {
-		  if (a.surname > b.surname) {
-			return 1;
-		  }
-		  if (a.surname < b.surname) {
-			return -1;
-		  }
-		  
-		  return 0;
-		});
-		
-		
-		var date1_array = getDatesArray(data_obj, "date1");
-		var mu_array = getArray(data_obj, "mil_unit");
-		var loc_array = getArray(data_obj, "loc");
-		var names_arr = getArray(data_obj, "surname");
-		
-		
-		// Fill NAMES list (Main Page)
-		fillList(data_obj);
+		readFile(fpath, function(data) {
+			data_obj = xml2dataobj(data);
+			data_obj.sort(function(a, b) { return (a.surname == b.surname) ? 0 : ((a.surname > b.surname) ? 1 : -1); });
 
-		
-		// Fill STATISTICS
-		$('#total-N').html(data_obj.length);
-		var date1_obj = getEqualN(date1_array);
-		
-		fillDateStat(date1_obj);
-		
-		
-		
-		
+			var date1_array = getDatesArray(data_obj, "date1");
+			var mu_array = getArray(data_obj, "mil_unit");
+			var loc_array = getArray(data_obj, "loc");
+			names_arr = getArray(data_obj, "surname");
+
+			// Fill NAMES list (Main Page)
+			fillList(data_obj);
+
+			// Fill STATISTICS
+			$('#total-N').html(data_obj.length);
+			var date1_obj = getEqualN(date1_array);
+
+			fillDateStat(date1_obj);
+
+			// ---------------------- GOOGLE MAPs ---------------------- //
+			
+			// Init map
+			map = new google.maps.Map(document.getElementById('map'), {
+				zoom: 7,
+				center: new google.maps.LatLng(34.9943184,37.9987275),
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			});
+			var infowindow = new google.maps.InfoWindow();
+			var marker, i;
+			var markers = [];
+			var loc_obj = getEqualN(loc_array);
+
+			// Set markers
+			readFile(fpath_loc, function(data_loc) {
+				var locations= xml2locArray(data_loc);
+
+				for (i = 0; i < locations.length; i++) {
+					var k = loc_obj.indexOf(locations[i][0]);
+					var N = loc_obj[k+1];
+					marker = new google.maps.Marker({
+						position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+						map: map,
+						label: {text: N.toString(), color: "#fff", fontWeight: "bold", fontSize: '16px'},
+						icon: {url: "img/loc_v2.png"}
+					});
+					markers[i] = marker;
+					google.maps.event.addListener(marker, 'click', (function(marker, i) {
+						return function() {
+							infowindow.setContent(locations[i][0]);
+							infowindow.open(map, marker);
+						}
+					})(marker, i));
+				}
+			});
+		});
+
+
 		// ---------------------- EVENTS ---------------------- //
 
 		// PAGE resize
@@ -78,7 +102,7 @@ $(document).ready(function(){
 
 		
 		// EVENT Click on NAME
-		$('.wrapper-list-item').click(function(){
+		$(document).on('click', '.wrapper-list-item', function(){
 			map.setCenter({lat: 35, lng: 39});
 			
 			var name = $(this).text();
@@ -121,62 +145,20 @@ $(document).ready(function(){
 		});
 
 		
-		// ---------------------- GOOGLE MAPs ---------------------- //
-		
-		// Init map
-		var map = new google.maps.Map(document.getElementById('map'), {
-			zoom: 7,
-			center: new google.maps.LatLng(34.9943184,37.9987275),
-			mapTypeId: google.maps.MapTypeId.ROADMAP
-		});
-		var infowindow = new google.maps.InfoWindow();
-		var marker, i;
-		var markers = [];
-		var loc_obj = getEqualN(loc_array);
 
-		// Set markers
-		data_loc = readFile(fpath_loc);
 
-		var locations= xml2locArray(data_loc);
-		
-		for (i = 0; i < locations.length; i++) {
-			var k = loc_obj.indexOf(locations[i][0]);
-			var N = loc_obj[k+1];
-			marker = new google.maps.Marker({
-				position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-				map: map,
-				label: {text: N.toString(), color: "#fff", fontWeight: "bold", fontSize: '16px'},
-				icon: {url: "img/loc_v2.png"}
-			});
-			markers[i] = marker;
-			google.maps.event.addListener(marker, 'click', (function(marker, i) {
-				return function() {
-					infowindow.setContent(locations[i][0]);
-					infowindow.open(map, marker);
-				}
-			})(marker, i));
-		}
-		
-		
-
-		
 		// ---------------------- FUNCTIONS ---------------------- //
 		
-		function readFile(fpath){
-			var data = '';
-			$.ajax({ type: "post",   
+		function readFile(fpath, callback)
+		{
+			$.ajax({ type: "get",   
 					url: fpath,   
-					async: false,
-					// dataType: 'binary',
-					// processData: false,
-					//data:{'z':'1'}, //
 					response:'text',
 					success : function(input_data)
 					{
-						 data = input_data;
+						callback(input_data);
 					}
 			});
-			return data;
 		}
 		
 		function getResHash(hash){
@@ -367,7 +349,6 @@ $(document).ready(function(){
 		
 		
 		function fillDescr(id, name){
-
 			var rank = data_obj[id].rank;
 			var mil_unit = data_obj[id].mil_unit;
 			var func = data_obj[id].func;
@@ -378,8 +359,8 @@ $(document).ready(function(){
 			var note1 = '';
 			var note2 = '';
 			var note3 = '';
-			if (typeof(data_obj[id].note1) != "undefined"){note1 = '<a href="'+data_obj[id].note1+'" target="_blank">статья1</a>';}
-			if (typeof(data_obj[id].note2) != "undefined"){note2 = ', <a href="'+data_obj[id].note2+'" target="_blank">статья2</a>';}
+			if (typeof(data_obj[id].note1) != "undefined"){note1 = '<a href="'+data_obj[id].note1+'" target="_blank">статья 1</a>';}
+			if (typeof(data_obj[id].note2) != "undefined"){note2 = ', <a href="'+data_obj[id].note2+'" target="_blank">статья 2</a>';}
 			if ((data_obj[id].note3).length > 0) {note3 = '<b>Note</b>: '+data_obj[id].note3+'<br/>';}
 			
 			var val = [func, mil_unit, date1, loc, circum_death];
@@ -413,7 +394,6 @@ $(document).ready(function(){
 			if (input_name.length > 0){
 				var n = -1;
 				for (i=0; i<names_arr.length; i++){
-					
 					if ((names_arr[i].toLowerCase()).indexOf(input_name.toLowerCase()) > -1){n = i; break;}
 				}
 			}
@@ -427,7 +407,4 @@ $(document).ready(function(){
 			}
 			return;
 		}
-
-		
-
 });
