@@ -34,7 +34,7 @@ h1{
 }
 
 .btn-search{
-	background-image: url('/img/search.png');
+	background-image: url('../img/search.png');
     background-size: auto 100%;
     background-position: left;
     background-repeat: no-repeat;
@@ -102,7 +102,7 @@ h1{
 
 
 .stat-desc-wrapper{
-	background-image: url("/img/removed.png");
+	background-image: url("../img/removed.png");
 	background-size: auto 95%;
 	background-position: left center;
 	background-repeat: no-repeat;
@@ -154,7 +154,7 @@ h1{
 
 .stat-N{
 	display: inline-block;
-	background-image: url("/img/removed.png");
+	background-image: url("../img/removed.png");
     background-size: auto 80%;
     background-position: left top;
     background-repeat: no-repeat;

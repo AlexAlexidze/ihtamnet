@@ -2,7 +2,7 @@
 
 body{
 	/* background-color: #585757; */
-	background-image: url("/img/backgr.png");
+	background-image: url("../img/backgr.png");
 	background-size: 100% auto;
 	background-position: left center;
 	/* background-repeat: no-repeat; */
