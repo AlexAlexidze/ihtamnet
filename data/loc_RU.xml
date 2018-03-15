@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<locations>
+  <location name="Латакия" lat="35.5435259" lon="35.7219758"/>
+  <location name="Хомс" lat="34.7302777" lon="36.6070418"/>
+  <location name="Алеппо" lat="36.2064142" lon="37.0785448"/>
+  <location name="Пальмира" lat="34.5692936" lon="38.2630628"/>
+  <location name="Дамаск" lat="33.5074558" lon="36.2128551"/>
+  <location name="Идлиб" lat="35.9266549" lon="36.6180588"/>
+  <location name="Тиас (Тьяс), Хомс" lat="34.515973" lon="37.6153986"/>
+  <location name="Тартус" lat="34.8860743" lon="35.8476714"/>
+  <location name="Хама" lat="35.1367539" lon="36.7153893"/>
+  <location name="Дейр-эз-Зор" lat="35.3351872" lon="40.1029562"/>
+  <location name="Хмеймим" lat="35.4072639" lon="35.9405797"/>
+</locations>
