@@ -16,6 +16,7 @@ var srizer       = require('gulp-srizer');
 var critical     = require('critical').stream;
 var replace      = require('gulp-replace');
 var rsync        = require('rsyncwrapper');
+var cachebust    = require('gulp-cache-bust');
 
 gulp.task('clean', function() {
 	return del(['dist/**', '!dist']);
@@ -39,9 +40,6 @@ gulp.task('images', function() {
 gulp.task('html', ['css', 'js'], function() {
 	var dest = 'dist'
 	return gulp.src(['./dev/*.html'])
-		.pipe(newer({
-			dest: dest
-		}))
 		.pipe(useref({
 			searchPath: 'dev',
 			noAssets: true
@@ -75,6 +73,7 @@ gulp.task('html', ['css', 'js'], function() {
 		.pipe(replace('\n<script></script>', ''))
 		.pipe(replace('\n</style>', '</style>'))
 		.pipe(replace('<style type="text/css">\n', '<style>'))
+		.pipe(cachebust({ type: 'timestamp' }))
 		.pipe(gulp.dest(dest))
 	;
 });
