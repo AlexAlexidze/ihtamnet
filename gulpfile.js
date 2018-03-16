@@ -15,6 +15,7 @@ var xslt         = require('gulp-xslt2');
 var srizer       = require('gulp-srizer');
 var critical     = require('critical').stream;
 var replace      = require('gulp-replace');
+var rsync        = require('rsyncwrapper');
 
 gulp.task('clean', function() {
 	return del(['dist/**', '!dist']);
@@ -140,5 +141,21 @@ gulp.task('xml:loc', function() {
 });
 
 gulp.task('xml', ['xml:data', 'xml:loc']);
+
+gulp.task('deploy', function(done) {
+	var config = require('./.internal/config.json');
+	rsync({
+		args: ['-aHz', '--password-file=.internal/password'],
+		src: './dist/',
+		dest: config.deploy_target,
+		delete: true,
+		dryRun: !true
+	}, function (error, stdout, stderr, cmd) {
+		console.log(cmd);
+		console.log(stdout);
+		console.log(stderr);
+		done();
+	});
+});
 
 gulp.task('default', ['images', 'css', 'js', 'html', 'xml']);
