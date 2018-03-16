@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:x="urn:schemas-microsoft-com:office:spreadsheet" version="1.0" exclude-result-prefixes="x">
-	<xsl:output method="xml" indent="yes" encoding="UTF-8"/>
+	<xsl:output method="xml" indent="no" encoding="UTF-8"/>
 
 	<xsl:template match="/">
 		<locations>

@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="UTF-8">
+		<meta charset="UTF-8"/>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 
 		<title>Ихтамнет_м0209</title>
 
+<noscript id="deferred-styles">
+<!-- build:css styles/combined.css -->
 		<link rel="stylesheet" href="styles/vendor/bootstrap/bootstrap.min.css"/>
 		<link rel="stylesheet" type="text/css" href="styles/style.css"/>
+<!-- endbuild -->
+</noscript>
+		<script></script>
 	</head>
 	<body>
 		<div class="container container-full">
@@ -64,9 +69,22 @@
 			</div>
 		</div>
 
+		<!-- build:js js/combined.js -->
 		<script src="js/jquery-3.3.1.slim.min.js"></script>
 		<script src="js/bootstrap.min.js"></script>
 		<script src="js/main.js"></script>
+		<!-- endbuild -->
+<script>
+var cb = function() {
+	var d = document;
+	var ds = d.getElementById("deferred-styles");
+	ds.parentNode.removeChild(ds);
+	var h = d.head;
+	h.innerHTML += ds.textContent;
+};
+var raf = requestAnimationFrame || mozRequestAnimationFrame || webkitRequestAnimationFrame || msRequestAnimationFrame;
+if (raf) raf(cb); else jQuery(document).ready(cb);
+</script>
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAnQRX_5tNToljnEYW69IPZwrmvEisAWQ"></script>
 	</body>
 </html>
