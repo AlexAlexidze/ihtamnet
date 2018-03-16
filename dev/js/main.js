@@ -37,63 +37,14 @@ $(document).ready(function(){
 
 	passive = passiveSupported ? { passive: true } : false;
 
-	// Read XML
-	readFile(fpath, function(data) {
-		data_obj = xml2dataobj(data);
-		data_obj.sort(function(a, b) { return (a.surname == b.surname) ? 0 : ((a.surname > b.surname) ? 1 : -1); });
-
-		var date1_array = getDatesArray(data_obj, "date1");
-		var loc_array = getArray(data_obj, "loc");
-		names_arr = getArray(data_obj, "surname");
-
-		// Fill NAMES list (Main Page)
-		fillList(data_obj);
-
-		// Fill STATISTICS
-		document.getElementById('total-N').innerHTML = data_obj.length;
-		var date1_obj = getEqualN(date1_array);
-
-		fillDateStat(date1_obj);
-
-		// ---------------------- GOOGLE MAPs ---------------------- //
-		map = new google.maps.Map(map_div, {
-			zoom      : 7,
-			center    : new google.maps.LatLng(34.9943184, 37.9987275),
-			mapTypeId : google.maps.MapTypeId.ROADMAP
-		});
-
-		var infowindow = new google.maps.InfoWindow();
-		var markers    = [];
-		var loc_obj    = getEqualN(loc_array);
-
-		// Set markers
-		readFile(fpath_loc, function(data_loc) {
-			var locations= xml2locArray(data_loc);
-
-			for (var i=0; i<locations.length; i++) {
-				var k = loc_obj.indexOf(locations[i][0]);
-				var N = loc_obj[k+1];
-				var marker = new google.maps.Marker({
-					position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-					map: map,
-					label: { text: N.toString(), color: "#fff", fontWeight: "bold", fontSize: '16px' },
-					icon:  { url: "img/loc_v2.png" }
-				});
-
-				markers[i] = marker;
-				google.maps.event.addListener(marker, 'click', (function(marker, i) {
-					return function() {
-						infowindow.setContent(locations[i][0]);
-						infowindow.open(map, marker);
-					}
-				})(marker, i));
-			}
-		});
-	});
-
+	if (typeof google === 'undefined') {
+		window.addEventListener('load', function() { readFile(fpath, loadData); });
+	}
+	else {
+		readFile(fpath, loadData);
+	}
 
 	// ---------------------- EVENTS ---------------------- //
-
 	// PAGE resize
 	window.addEventListener('resize', resizeHandler);
 
@@ -132,6 +83,59 @@ $(document).ready(function(){
 
 
 	// ---------------------- FUNCTIONS ---------------------- //
+	function loadData(data)
+	{
+		data_obj = xml2dataobj(data);
+		data_obj.sort(function(a, b) { return (a.surname == b.surname) ? 0 : ((a.surname > b.surname) ? 1 : -1); });
+
+		var date1_array = getDatesArray(data_obj, "date1");
+		var loc_array = getArray(data_obj, "loc");
+		names_arr = getArray(data_obj, "surname");
+
+		// Fill NAMES list (Main Page)
+		fillList(data_obj);
+
+		// Fill STATISTICS
+		document.getElementById('total-N').innerHTML = data_obj.length;
+		var date1_obj = getEqualN(date1_array);
+		fillDateStat(date1_obj);
+
+		// ---------------------- GOOGLE MAPs ---------------------- //
+		map = new google.maps.Map(map_div, {
+			zoom      : 7,
+			center    : new google.maps.LatLng(34.9943184, 37.9987275),
+			mapTypeId : google.maps.MapTypeId.ROADMAP
+		});
+
+		var infowindow = new google.maps.InfoWindow();
+		var markers    = [];
+		var loc_obj    = getEqualN(loc_array);
+
+		// Set markers
+		readFile(fpath_loc, function(data_loc) {
+			var locations= xml2locArray(data_loc);
+
+			for (var i=0; i<locations.length; i++) {
+				var k = loc_obj.indexOf(locations[i][0]);
+				var N = loc_obj[k+1];
+				var marker = new google.maps.Marker({
+					position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+					map: map,
+					label: { text: N.toString(), color: "#fff", fontWeight: "bold", fontSize: '16px' },
+					icon:  { url: "img/loc_v2.png" }
+				});
+
+				markers[i] = marker;
+				google.maps.event.addListener(marker, 'click', (function(marker, i) {
+					return function() {
+						infowindow.setContent(locations[i][0]);
+						infowindow.open(map, marker);
+					}
+				})(marker, i));
+			}
+		});
+	}
+
 	function readFile(fpath, callback)
 	{
 		var req = new XMLHttpRequest();
@@ -183,12 +187,11 @@ $(document).ready(function(){
 				var d = date1.match(dp);
 				if (d) {
 					if (d.length > 3) {
-						date1 = d[2] + '.' + d[1] + '.' + d[0];
+						date1 = [d[0], d[1], d[2]];
 					}
 
 					if (d.length > 0 && parseInt(d[0] < 100)) {
-						d = d.reverse();
-						date1 = d[2] + '.' + d[1] + '.' + d[0];
+						date1 = d.reverse();
 					}
 				}
 
@@ -312,6 +315,10 @@ $(document).ready(function(){
 		var date1 = data_obj[id].date1;
 		var loc = data_obj[id].loc;
 		var circum_death = data_obj[id].circum_death;
+
+		if (date1.length) {
+			date1 = date1[2] + '.' + date1[1] + '.' + date1[0];
+		}
 
 		var note1 = '';
 		var note2 = '';
