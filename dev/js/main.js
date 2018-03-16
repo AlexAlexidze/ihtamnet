@@ -183,10 +183,12 @@ $(document).ready(function(){
 				var d = date1.match(dp);
 				if (d) {
 					if (d.length > 3) {
-						date1 = [d[0], d[1], d[2]];
+						date1 = d[2] + '.' + d[1] + '.' + d[0];
 					}
-					else if (d.length > 0 && parseInt(d[0] < 100)) {
-						date1 = d.reverse();
+
+					if (d.length > 0 && parseInt(d[0] < 100)) {
+						d = d.reverse();
+						date1 = d[2] + '.' + d[1] + '.' + d[0];
 					}
 				}
 
