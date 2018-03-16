@@ -68,7 +68,7 @@ gulp.task('html', ['css', 'js'], function() {
 			base: './dist/',
 			inline: true,
 			minify: true,
-			css: ['dist/styles/combined.css'],
+			css: ['dist/styles/combined.min.css'],
 			ignore: ['@font-face', /url\(/],
 			penthouse: { keepLargerMediaQueries: true }
 		}))
@@ -85,11 +85,11 @@ gulp.task('css', function() {
 	return gulp.src(src)
 		.pipe(prune({
 			dest: dest,
-			map: function() { return ['combined.css', 'combined.css.map']; }
+			map: function() { return ['combined.min.css', 'combined.min.css.map']; }
 		}))
-		.pipe(newer({ dest: dest + '/combined.css' }))
+		.pipe(newer({ dest: dest + '/combined.min.css' }))
 		.pipe(sourcemaps.init())
-		.pipe(concat('combined.css'))
+		.pipe(concat('combined.min.css'))
 		.pipe(
 			postcss([
 				require('autoprefixer')({browsers: '> 5%'}),
@@ -107,11 +107,11 @@ gulp.task('js', function() {
 	return gulp.src(src)
 		.pipe(prune({
 			dest: dest,
-			map: function() { return ['combined.js', 'combined.js.map']; }
+			map: function() { return ['combined.min.js', 'combined.min.js.map']; }
 		}))
-		.pipe(newer({ dest: dest + '/combined.js' }))
+		.pipe(newer({ dest: dest + '/combined.min.js' }))
 		.pipe(sourcemaps.init())
-		.pipe(concat('combined.js'))
+		.pipe(concat('combined.min.js'))
 		.pipe(uglify())
 		.pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest(dest))
